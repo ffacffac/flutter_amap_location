@@ -38,11 +38,11 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
         this.channel = channel;
     }
 
-    private Activity getActivity(){
+    private Activity getActivity() {
         return registrar.activity();
     }
 
-    private Context getApplicationContext(){
+    private Context getApplicationContext() {
         return registrar.activity().getApplicationContext();
     }
 
@@ -51,7 +51,7 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
      */
     public static void registerWith(Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "amap_location");
-        channel.setMethodCallHandler(new AmapLocationPlugin(registrar,channel));
+        channel.setMethodCallHandler(new AmapLocationPlugin(registrar, channel));
     }
 
     @Override
@@ -64,21 +64,21 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
             //启动
             result.success(this.startup((Map) call.arguments));
 
-        } else if("shutdown".equals(method)){
+        } else if ("shutdown".equals(method)) {
             //关闭
             result.success(this.shutdown());
-        } else if("getLocation".equals(method)){
+        } else if ("getLocation".equals(method)) {
             boolean needsAddress = (boolean) call.arguments;
-            this.getLocation(needsAddress,result);
-        } else if("startLocation".equals(method)){
+            this.getLocation(needsAddress, result);
+        } else if ("startLocation".equals(method)) {
             //启动定位,如果还没有启动，那么返回false
             result.success(this.startLocation(this));
-        } else if("stopLocation".equals(method)){
+        } else if ("stopLocation".equals(method)) {
             //停止定位
             result.success(this.stopLocation());
-        } else if("updateOption".equals(method)){
+        } else if ("updateOption".equals(method)) {
             result.success(this.updateOption((Map) call.arguments));
-        } else if("setApiKey".equals(method)){
+        } else if ("setApiKey".equals(method)) {
             result.success(false);
         } else {
             result.notImplemented();
@@ -87,11 +87,11 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
 
 
     private boolean getLocation(boolean needsAddress, final Result result) {
-        synchronized (this){
+        synchronized (this) {
 
-            if(locationClient==null)return false;
+            if (locationClient == null) return false;
 
-            if(needsAddress!=option.isNeedAddress()){
+            if (needsAddress != option.isNeedAddress()) {
                 option.setNeedAddress(needsAddress);
                 locationClient.setLocationOption(option);
             }
@@ -116,20 +116,20 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
 
     private static final String TAG = "AmapLocationPugin";
 
-    private Map resultToMap(AMapLocation a){
+    private Map resultToMap(AMapLocation a) {
 
         Map map = new HashMap();
 
-        if(a!=null) {
+        if (a != null) {
 
             if (a.getErrorCode() != 0) {
                 //错误信息
 
                 map.put("description", a.getErrorInfo());
-                map.put("success",false);
+                map.put("success", false);
 
-            }else{
-                map.put("success",true);
+            } else {
+                map.put("success", true);
 
 
                 map.put("accuracy", a.getAccuracy());
@@ -139,30 +139,26 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
                 map.put("latitude", a.getLatitude());
                 map.put("longitude", a.getLongitude());
                 map.put("locationType", a.getLocationType());
-                map.put("provider",a.getProvider());
+                map.put("provider", a.getProvider());
 
 
-                map.put("formattedAddress",a.getAddress());
-                map.put("country",a.getCountry());
-                map.put("province",a.getProvince());
-                map.put("city",a.getCity());
-                map.put("district",a.getDistrict());
-                map.put("citycode",a.getCityCode());
-                map.put("adcode",a.getAdCode());
-                map.put("street",a.getStreet());
-                map.put("number",a.getStreetNum());
-                map.put("POIName",a.getPoiName());
-                map.put("AOIName",a.getAoiName());
+                map.put("formattedAddress", a.getAddress());
+                map.put("country", a.getCountry());
+                map.put("province", a.getProvince());
+                map.put("city", a.getCity());
+                map.put("district", a.getDistrict());
+                map.put("citycode", a.getCityCode());
+                map.put("adcode", a.getAdCode());
+                map.put("street", a.getStreet());
+                map.put("number", a.getStreetNum());
+                map.put("POIName", a.getPoiName());
+                map.put("AOIName", a.getAoiName());
 
             }
 
             map.put("code", a.getErrorCode());
 
-            Log.d(TAG,"定位获取结果:"+a.getLatitude() + " code："+a.getErrorCode() + " 省:"+a.getProvince());
-
-
-
-
+            Log.d(TAG, "定位获取结果:" + a.getLatitude() + " code：" + a.getErrorCode() + " 省:" + a.getProvince());
 
 
         }
@@ -171,8 +167,8 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
     }
 
     private boolean stopLocation() {
-        synchronized (this){
-            if(locationClient==null){
+        synchronized (this) {
+            if (locationClient == null) {
                 return false;
             }
             locationClient.stopLocation();
@@ -183,8 +179,8 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
     }
 
     private boolean shutdown() {
-        synchronized (this){
-            if(locationClient!=null){
+        synchronized (this) {
+            if (locationClient != null) {
                 locationClient.stopLocation();
                 locationClient = null;
                 option = null;
@@ -196,17 +192,17 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
 
     }
 
-    private boolean startLocation(AMapLocationListener listener){
-        synchronized (this){
-            if(locationClient==null){
+    private boolean startLocation(AMapLocationListener listener) {
+        synchronized (this) {
+            if (locationClient == null) {
                 return false;
             }
 
-            if(listener==this){
+            if (listener == this) {
                 //持续定位
 
 
-            }else{
+            } else {
                 //单次定位
 
             }
@@ -220,10 +216,11 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
     }
 
     private boolean startup(Map arguments) {
-        synchronized (this){
-			AMapLocationClient.updatePrivacyShow(getApplicationContext(), true, true);
+        synchronized (this) {
+            //添加隐私条款确认
+            AMapLocationClient.updatePrivacyShow(getApplicationContext(), true, true);
             AMapLocationClient.updatePrivacyAgree(getApplicationContext(), true);
-            if(locationClient==null){
+            if (locationClient == null) {
                 //初始化client
                 try {
                     locationClient = new AMapLocationClient(getApplicationContext());
@@ -232,7 +229,7 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
                 }
                 //设置定位参数
                 AMapLocationClientOption option = new AMapLocationClientOption();
-                parseOptions(option,arguments);
+                parseOptions(option, arguments);
                 locationClient.setLocationOption(option);
 
                 //将option保存一下
@@ -245,11 +242,11 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
         }
     }
 
-    private boolean updateOption(Map arguments){
-        synchronized (this){
-            if(locationClient==null)return false;
+    private boolean updateOption(Map arguments) {
+        synchronized (this) {
+            if (locationClient == null) return false;
 
-            parseOptions(option,arguments);
+            parseOptions(option, arguments);
             locationClient.setLocationOption(option);
 
             return true;
@@ -258,35 +255,36 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
 
     /**
      * this.locationMode : AMapLocationMode.Hight_Accuracy,
-     this.gpsFirst:false,
-     this.httpTimeOut:10000,             //30有点长，特殊情况才需要这么长，改成10
-     this.interval:2000,
-     this.needsAddress : true,
-     this.onceLocation : false,
-     this.onceLocationLatest : false,
-     this.locationProtocal : AMapLocationProtocol.HTTP,
-     this.sensorEnable : false,
-     this.wifiScan : true,
-     this.locationCacheEnable : true,
-
-     this.allowsBackgroundLocationUpdates : false,
-     this.desiredAccuracy : CLLocationAccuracy.kCLLocationAccuracyBest,
-     this.locatingWithReGeocode : false,
-     this.locationTimeout : 10000,     //30有点长，特殊情况才需要这么长，改成10
-     this.pausesLocationUpdatesAutomatically : false,
-     this.reGeocodeTimeout : 5000,
-
-
-     this.geoLanguage : GeoLanguage.DEFAULT,
+     * this.gpsFirst:false,
+     * this.httpTimeOut:10000,             //30有点长，特殊情况才需要这么长，改成10
+     * this.interval:2000,
+     * this.needsAddress : true,
+     * this.onceLocation : false,
+     * this.onceLocationLatest : false,
+     * this.locationProtocal : AMapLocationProtocol.HTTP,
+     * this.sensorEnable : false,
+     * this.wifiScan : true,
+     * this.locationCacheEnable : true,
+     * <p>
+     * this.allowsBackgroundLocationUpdates : false,
+     * this.desiredAccuracy : CLLocationAccuracy.kCLLocationAccuracyBest,
+     * this.locatingWithReGeocode : false,
+     * this.locationTimeout : 10000,     //30有点长，特殊情况才需要这么长，改成10
+     * this.pausesLocationUpdatesAutomatically : false,
+     * this.reGeocodeTimeout : 5000,
+     * <p>
+     * <p>
+     * this.geoLanguage : GeoLanguage.DEFAULT,
+     *
      * @param arguments
      * @return
      */
-    private void parseOptions(AMapLocationClientOption option,Map arguments) {
+    private void parseOptions(AMapLocationClientOption option, Map arguments) {
         //  AMapLocationClientOption option = new AMapLocationClientOption();
         onceLocation = (Boolean) arguments.get("onceLocation");
         option.setLocationMode(AMapLocationClientOption.AMapLocationMode.valueOf((String) arguments.get("locationMode")));//可选，设置定位模式，可选的模式有高精度、仅设备、仅网络。默认为高精度模式
-        option.setGpsFirst( (Boolean)arguments.get("gpsFirst") );//可选，设置是否gps优先，只在高精度模式下有效。默认关闭
-        option.setHttpTimeOut(  (Integer) arguments.get("httpTimeOut"));//可选，设置网络请求超时时间。默认为30秒。在仅设备模式下无效
+        option.setGpsFirst((Boolean) arguments.get("gpsFirst"));//可选，设置是否gps优先，只在高精度模式下有效。默认关闭
+        option.setHttpTimeOut((Integer) arguments.get("httpTimeOut"));//可选，设置网络请求超时时间。默认为30秒。在仅设备模式下无效
         option.setInterval((Integer) arguments.get("interval"));//可选，设置定位间隔。默认为2秒
         option.setNeedAddress((Boolean) arguments.get("needsAddress"));//可选，设置是否返回逆地理地址信息。默认是true
         option.setOnceLocation(onceLocation);//可选，设置是否单次定位。默认是false
@@ -303,10 +301,10 @@ public class AmapLocationPlugin implements MethodCallHandler, AMapLocationListen
     @Override
     public void onLocationChanged(AMapLocation aMapLocation) {
 
-        synchronized (this){
-            if(channel==null)return;
-            Map<String,Object> data = new HashMap<>();
-            channel.invokeMethod("updateLocation",resultToMap(aMapLocation));
+        synchronized (this) {
+            if (channel == null) return;
+            Map<String, Object> data = new HashMap<>();
+            channel.invokeMethod("updateLocation", resultToMap(aMapLocation));
         }
     }
 }
