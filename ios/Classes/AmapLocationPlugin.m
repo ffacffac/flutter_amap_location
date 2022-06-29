@@ -59,6 +59,11 @@ static NSDictionary* DesiredAccuracy = @{@"kCLLocationAccuracyBest":@(kCLLocatio
         result(@([self updateOption:call.arguments]));
         
     }else if([@"setApiKey" isEqualToString:method]){
+
+        //检查隐私合规
+        [[AMapNaviManagerConfig sharedConfig] updatePrivacyShow:AMapPrivacyShowStatusDidShow privacyInfo:AMapPrivacyInfoStatusDidContain];
+        [[AMapNaviManagerConfig sharedConfig] updatePrivacyAgree:AMapPrivacyAgreeStatusDidAgree];
+
         [AMapServices sharedServices].apiKey = call.arguments;
 
         result(@YES);
